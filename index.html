@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>G Travel — Project Itinerary Planner</title>
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Widgets/widgets.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08070d;--panel:#11101a;--panel2:#171522;--line:#302c3d;--ink:#f4f1fa;--muted:#9a93aa;--blue:#72d4d8;--gold:#e6b86a;--green:#77c7a2;--danger:#ef7d91;--violet:#9f8cff;--shadow:0 18px 50px rgba(0,0,0,.48)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:14px/1.45 Manrope,"Segoe UI",system-ui,sans-serif}button,input{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+header{height:68px;padding:0 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--line);background:rgba(10,8,15,.94);backdrop-filter:blur(10px);position:sticky;top:0;z-index:1000}.brandmark{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(145deg,#9f8cff,#5472d8);font-size:19px;font-weight:900}.brand h1{font-size:18px;margin:0}.brand small,.muted{color:var(--muted)}.headstats{margin-left:auto;display:flex;gap:22px;font-size:12px}.headstats b{display:block;color:var(--ink);font-size:16px}
+main{min-height:0;display:grid;grid-template-columns:370px minmax(0,1fr)}aside{background:#0c0a12;border-right:1px solid var(--line);padding:18px;overflow:auto}.workspace{min-width:0;display:grid;grid-template-rows:minmax(430px,52vh) minmax(420px,1fr)}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin:4px 0 10px}.searchrow{display:flex;gap:8px}.searchrow input{flex:1}.control,input[type=text],input[type=date],input[type=number]{background:#100e18;border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:9px 10px;outline:none}.control:focus,input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(73,162,209,.12)}button{border:1px solid var(--line);background:#161d28;color:var(--ink);border-radius:9px;padding:9px 12px}button:hover{border-color:#3e5268}.primary{background:linear-gradient(180deg,#9f8cff,#6e62ca);border-color:#ad9cff;color:#fff}.primary:hover{filter:brightness(1.08)}.actions{display:flex;gap:8px;margin-top:10px}.actions button{flex:1}.results{display:none;margin-top:6px;border:1px solid var(--line);background:#0d121a;border-radius:10px;overflow:hidden}.results.open{display:block}.res{display:flex;gap:10px;padding:9px 11px;border-bottom:1px solid #1a222d;cursor:pointer}.res:hover{background:#17202b}.iata{width:40px;color:var(--blue);font-weight:900}.res small{display:block;color:var(--muted)}
+.stop-list{display:flex;flex-direction:column;gap:10px}.empty{border:1px dashed var(--line);border-radius:12px;padding:20px;text-align:center;color:var(--muted)}.stop-card{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:11px;box-shadow:0 8px 24px rgba(0,0,0,.18)}.stop-head{display:flex;align-items:flex-start;gap:9px}.badge{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#081017;flex:none}.stop-main{min-width:0;flex:1}.stop-title{font-weight:800}.stop-title span{color:var(--gold)}.stop-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini-actions{display:flex;gap:4px}.mini-actions button{padding:3px 7px;border-radius:6px}.dategrid{display:grid;grid-template-columns:1fr 90px;gap:8px;margin-top:10px}.dategrid label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;display:block;margin-bottom:4px}.dategrid input{width:100%}.summarycard{margin-top:16px;border:1px solid var(--line);background:linear-gradient(145deg,#111722,#0c1118);padding:13px;border-radius:12px}.summarygrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summarygrid b{display:block;font-size:17px}.summarygrid span{font-size:11px;color:var(--muted)}
+.mapbox{position:relative;min-height:0;overflow:hidden}.map-surface{position:absolute;inset:0;width:100%;height:100%;background:#090711}.map-surface.hidden{display:none}.map-overlay{position:absolute;right:14px;top:14px;z-index:800;background:rgba(13,10,20,.92);border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow);font-size:12px;backdrop-filter:blur(12px)}.map-switch{position:absolute;left:14px;top:14px;z-index:800;display:flex;padding:4px;background:rgba(13,10,20,.92);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}.map-switch button{padding:7px 12px;border:0;background:transparent;color:var(--muted)}.map-switch button.active{background:#29243a;color:var(--ink);box-shadow:inset 0 0 0 1px #413a58}.leaflet-container{font-family:inherit;background:#090711}.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#171522;color:var(--ink)}.leaflet-control-zoom a{background:#171522!important;color:var(--ink)!important;border-color:var(--line)!important}.cesium-viewer-bottom,.cesium-viewer-toolbar,.cesium-viewer-animationContainer,.cesium-viewer-timelineContainer,.cesium-viewer-fullscreenContainer{display:none!important}.cesium-widget-credits{display:none!important}
+.bottom{min-height:0;border-top:1px solid var(--line);background:#090d13;display:grid;grid-template-rows:auto 1fr}.tabsbar{display:flex;align-items:center;gap:5px;padding:10px 14px;border-bottom:1px solid var(--line);background:#0e131b}.tab{background:transparent;color:var(--muted);border-color:transparent;padding:7px 14px}.tab.active{background:#19222e;color:var(--blue);border-color:var(--line)}.tabsbar .spacer{flex:1}.linkbtn{font-size:12px;color:var(--blue);text-decoration:none}.view{overflow:auto;min-height:0}
+/* Gantt */.gantt-shell{min-width:980px;padding:18px}.gantt-toolbar{display:flex;align-items:end;gap:12px;margin-bottom:14px}.gantt-toolbar h3{margin:0;font-size:16px}.gantt-toolbar .spacer{flex:1}.gantt-toolbar label{font-size:10px;color:var(--muted);text-transform:uppercase}.gantt-toolbar select{display:block;margin-top:3px}.gantt-grid{display:grid;grid-template-columns:250px minmax(700px,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden}.gantt-left,.gantt-right{background:#0d1219}.gantt-head{height:56px;border-bottom:1px solid var(--line);background:#121923;position:sticky;top:0;z-index:4}.gantt-left .gantt-head{padding:10px 14px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px}.gantt-row-label{height:58px;border-bottom:1px solid #1b222c;padding:8px 12px;display:flex;align-items:center;gap:10px}.gantt-row-label:last-child,.gantt-row:last-child{border-bottom:0}.gantt-row-label b{display:block}.gantt-row-label small{color:var(--muted)}.gantt-right{position:relative;overflow:hidden}.gantt-head.timeline-head{display:grid;align-items:end}.tick{border-left:1px solid #2a3441;height:100%;padding:8px 5px;font-size:10px;color:var(--muted);display:flex;align-items:flex-end}.gantt-row{height:58px;border-bottom:1px solid #1b222c;position:relative;background-image:linear-gradient(to right,rgba(255,255,255,.035) 1px,transparent 1px);background-size:calc(100% / var(--days)) 100%}.gantt-bar{position:absolute;top:14px;height:30px;border-radius:7px;padding:6px 10px;color:#061019;font-size:11px;font-weight:900;white-space:nowrap;overflow:hidden;box-shadow:0 6px 15px rgba(0,0,0,.25)}.flight-pin{position:absolute;top:7px;width:2px;height:44px;background:var(--gold)}.flight-pin:after{content:'✈';position:absolute;top:-7px;left:-8px;color:var(--gold);font-size:14px}.todayline{position:absolute;top:56px;bottom:0;width:2px;background:var(--danger);z-index:3}.todayline:before{content:'Today';position:absolute;top:-19px;left:-15px;font-size:9px;color:var(--danger)}
+/* calendar */.calendar-shell{padding:20px}.calendar-top{display:flex;align-items:center;margin-bottom:16px}.calendar-top h3{margin:0;font-size:17px}.calendar-top .spacer{flex:1}.months{display:grid;grid-template-columns:repeat(auto-fit,minmax(390px,1fr));gap:20px}.month{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0d1219;box-shadow:0 10px 30px rgba(0,0,0,.2)}.month-title{font-size:17px;font-weight:800;padding:14px 16px;background:#131a24;border-bottom:1px solid var(--line)}.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}.wd{padding:9px;text-align:center;color:var(--muted);font-size:11px;border-bottom:1px solid var(--line)}.day{min-height:82px;border-right:1px solid #1c242f;border-bottom:1px solid #1c242f;padding:7px;position:relative}.day:nth-child(7n){border-right:0}.day.blank{background:#090d13}.daynum{font-size:12px;color:var(--muted)}.day.intrip .daynum{color:var(--ink);font-weight:800}.citychip{margin-top:9px;border-radius:6px;padding:5px 6px;font-size:11px;font-weight:900;color:#061019;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.arrival{position:absolute;right:6px;top:6px;color:var(--gold);font-size:11px}.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:15px}.legend span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}.legend i{width:12px;height:12px;border-radius:3px}
+/* legs */table{width:100%;border-collapse:collapse}th,td{padding:11px 13px;border-bottom:1px solid #1b232d;text-align:left}th{position:sticky;top:0;background:#121923;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px}td.num,th.num{text-align:right}.total td{font-weight:900;color:var(--gold)}
+.flight-export{position:relative}.export-menu{display:none;position:absolute;right:0;top:42px;width:min(430px,90vw);z-index:1200;background:#15121f;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:12px}.export-menu.open{display:block}.export-menu h4{margin:0 0 5px}.export-menu p{margin:0 0 10px;color:var(--muted);font-size:12px}.export-all{width:100%;text-align:left;background:linear-gradient(135deg,#29243b,#201c30);margin-bottom:9px}.leg-searches{max-height:260px;overflow:auto;display:flex;flex-direction:column;gap:6px}.leg-search{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid #2b2738;border-radius:9px;background:#100e18}.leg-search div{flex:1}.leg-search small{display:block;color:var(--muted)}.leg-search button{padding:6px 9px}.warning{color:var(--gold);font-size:11px;margin-top:8px}@media(max-width:900px){main{grid-template-columns:1fr}.workspace{grid-template-rows:55vh auto}aside{border-right:0;border-bottom:1px solid var(--line)}.headstats{display:none}.months{grid-template-columns:1fr}.month{min-width:360px}.workspace{min-height:900px}}
+</style>
+</head>
+<body><div class="app">
+<header><div class="brandmark">G</div><div class="brand"><h1>G Travel</h1><small>Multi-city project itinerary planner</small></div><div class="headstats"><div><b id="statStops">0</b>Stops</div><div><b id="statNights">0</b>Nights</div><div><b id="statKm">0</b>km</div></div></header>
+<main><aside>
+<h2>Add destination</h2><div class="searchrow"><input id="search" type="text" placeholder="Search airport, city or IATA"><button id="add" class="primary">Add</button></div><div class="results" id="results"></div>
+<div class="actions"><button id="sample">Load sample</button><button id="autodates">Auto dates</button><button id="clear">Clear</button></div>
+<h2 style="margin-top:22px">Itinerary</h2><div id="stopList" class="stop-list"></div><div id="empty" class="empty">Add your first destination to begin.</div>
+<div class="summarycard"><div class="summarygrid"><div><b id="sumRange">—</b><span>Trip dates</span></div><div><b id="sumDuration">—</b><span>Total duration</span></div><div><b id="sumDistance">0 km</b><span>Great-circle distance</span></div><div><b id="sumLegs">0</b><span>Flight legs</span></div></div></div>
+</aside>
+<section class="workspace"><div class="mapbox"><div id="map2d" class="map-surface"></div><div id="map3d" class="map-surface hidden"></div><div class="map-switch"><button id="mode2d" class="active">2D map</button><button id="mode3d">3D globe</button></div><div class="map-overlay"><b id="mapTitle">Interactive 2D map</b><br><span id="mapSub" class="muted">Dark basemap · route fitted automatically</span></div></div>
+<div class="bottom"><div class="tabsbar"><button class="tab active" data-view="gantt">Project timeline</button><button class="tab" data-view="calendar">Large calendar</button><button class="tab" data-view="legs">Flight legs</button><div class="spacer"></div><div class="flight-export"><button id="googleFlights" class="primary">Search Google Flights</button><div id="exportMenu" class="export-menu"></div></div><a href="#" id="csv" class="linkbtn">Download CSV</a></div><div id="view" class="view"></div></div></section>
+</main></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.123/Build/Cesium/Cesium.js"></script>
+<script>
+const AIRPORTS = [
+["ATL","Atlanta","USA",33.6407,-84.4277,"Hartsfield–Jackson Atlanta Intl",["Delta","Southwest","American","Spirit","Frontier"]],
+["LAX","Los Angeles","USA",33.9416,-118.4085,"Los Angeles Intl",["American","United","Delta","Southwest","Alaska"]],
+["ORD","Chicago","USA",41.9742,-87.9073,"O'Hare Intl",["United","American","Spirit","Delta","Frontier"]],
+["DFW","Dallas","USA",32.8998,-97.0403,"Dallas/Fort Worth Intl",["American","Spirit","United","Delta","Frontier"]],
+["DEN","Denver","USA",39.8561,-104.6737,"Denver Intl",["United","Southwest","Frontier","American","Delta"]],
+["JFK","New York","USA",40.6413,-73.7781,"John F. Kennedy Intl",["JetBlue","Delta","American","Emirates","British Airways"]],
+["SFO","San Francisco","USA",37.6213,-122.3790,"San Francisco Intl",["United","Alaska","Delta","American","Southwest"]],
+["SEA","Seattle","USA",47.4502,-122.3088,"Seattle–Tacoma Intl",["Alaska","Delta","United","American","Southwest"]],
+["LAS","Las Vegas","USA",36.0840,-115.1537,"Harry Reid Intl",["Southwest","Spirit","Frontier","American","Delta"]],
+["MIA","Miami","USA",25.7959,-80.2870,"Miami Intl",["American","Frontier","Spirit","Delta","LATAM"]],
+["BOS","Boston","USA",42.3656,-71.0096,"Logan Intl",["JetBlue","Delta","American","United","Southwest"]],
+["EWR","Newark","USA",40.6895,-74.1745,"Newark Liberty Intl",["United","JetBlue","American","Delta","Spirit"]],
+["MCO","Orlando","USA",28.4312,-81.3081,"Orlando Intl",["Southwest","Spirit","Frontier","JetBlue","American"]],
+["IAH","Houston","USA",29.9902,-95.3368,"George Bush Intercontinental",["United","American","Spirit","Delta","Southwest"]],
+["PHX","Phoenix","USA",33.4342,-112.0116,"Phoenix Sky Harbor Intl",["American","Southwest","Frontier","Delta","United"]],
+["IAD","Washington","USA",38.9531,-77.4565,"Washington Dulles Intl",["United","American","Delta","JetBlue","Southwest"]],
+["DCA","Washington","USA",38.8512,-77.0402,"Ronald Reagan Washington National",["American","Delta","Southwest","United","JetBlue"]],
+["MSP","Minneapolis","USA",44.8848,-93.2223,"Minneapolis–St Paul Intl",["Delta","Sun Country","Southwest","American","United"]],
+["DTW","Detroit","USA",42.2124,-83.3534,"Detroit Metropolitan Wayne County",["Delta","Spirit","American","United","Southwest"]],
+["PHL","Philadelphia","USA",39.8744,-75.2424,"Philadelphia Intl",["American","Frontier","Spirit","Southwest","Delta"]],
+["LGA","New York","USA",40.7769,-73.8740,"LaGuardia",["Delta","American","Southwest","JetBlue","United"]],
+["SLC","Salt Lake City","USA",40.7899,-111.9791,"Salt Lake City Intl",["Delta","Southwest","American","United","JetBlue"]],
+["SAN","San Diego","USA",32.7338,-117.1933,"San Diego Intl",["Southwest","American","United","Delta","Alaska"]],
+["HNL","Honolulu","USA",21.3187,-157.9224,"Daniel K. Inouye Intl",["Hawaiian","Southwest","United","Delta","American"]],
+["YYZ","Toronto","Canada",43.6777,-79.6248,"Toronto Pearson Intl",["Air Canada","WestJet","Porter","Flair","American"]],
+["YVR","Vancouver","Canada",49.1967,-123.1815,"Vancouver Intl",["Air Canada","WestJet","Flair","Air Transat","United"]],
+["YUL","Montreal","Canada",45.4706,-73.7408,"Montréal–Trudeau Intl",["Air Canada","WestJet","Air Transat","Porter","Flair"]],
+["YYC","Calgary","Canada",51.1139,-114.0203,"Calgary Intl",["WestJet","Air Canada","Flair","Air Transat","United"]],
+["MEX","Mexico City","Mexico",19.4361,-99.0719,"Mexico City Intl (Benito Juárez)",["Aeroméxico","Volaris","VivaAerobus","American","United"]],
+["CUN","Cancun","Mexico",21.0365,-86.8771,"Cancún Intl",["Volaris","VivaAerobus","American","United","Aeroméxico"]],
+["GRU","Sao Paulo","Brazil",-23.4356,-46.4731,"São Paulo/Guarulhos Intl",["LATAM","Gol","Azul","American","United"]],
+["GIG","Rio de Janeiro","Brazil",-22.8090,-43.2506,"Rio de Janeiro/Galeão Intl",["LATAM","Gol","Azul","TAP","American"]],
+["BSB","Brasilia","Brazil",-15.8697,-47.9208,"Brasília Intl",["Gol","LATAM","Azul"]],
+["EZE","Buenos Aires","Argentina",-34.8222,-58.5358,"Ministro Pistarini Intl (Ezeiza)",["Aerolíneas Argentinas","LATAM","Flybondi","JetSmart","American"]],
+["SCL","Santiago","Chile",-33.3930,-70.7858,"Arturo Merino Benítez Intl",["LATAM","JetSmart","Sky Airline","Aerolíneas Argentinas","American"]],
+["LIM","Lima","Peru",-12.0219,-77.1143,"Jorge Chávez Intl",["LATAM","Sky Airline","JetSmart","Avianca","American"]],
+["BOG","Bogota","Colombia",4.7016,-74.1469,"El Dorado Intl",["Avianca","LATAM","Wingo","Copa","American"]],
+["PTY","Panama City","Panama",9.0714,-79.3835,"Tocumen Intl",["Copa","American","United","KLM"]],
+["UIO","Quito","Ecuador",-0.1292,-78.3575,"Mariscal Sucre Intl",["Avianca","LATAM","American"]],
+["MVD","Montevideo","Uruguay",-34.8384,-56.0308,"Carrasco Intl",["Aerolíneas Argentinas","LATAM","American"]],
+["CCS","Caracas","Venezuela",10.6013,-66.9911,"Simón Bolívar Intl",["Avior","Laser","Copa"]],
+["LPB","La Paz","Bolivia",-16.5133,-68.1923,"El Alto Intl",["Boliviana de Aviación","LATAM"]],
+["LHR","London","UK",51.4700,-0.4543,"Heathrow",["British Airways","Virgin Atlantic","American","Lufthansa","Emirates"]],
+["LGW","London","UK",51.1537,-0.1821,"Gatwick",["easyJet","British Airways","TUI","Vueling","Wizz Air"]],
+["CDG","Paris","France",49.0097,2.5479,"Charles de Gaulle",["Air France","easyJet","Delta","Lufthansa","Vueling"]],
+["AMS","Amsterdam","Netherlands",52.3105,4.7683,"Amsterdam Schiphol",["KLM","Transavia","easyJet","Delta","Vueling"]],
+["FRA","Frankfurt","Germany",50.0379,8.5622,"Frankfurt am Main",["Lufthansa","Condor","United","Discover","Turkish Airlines"]],
+["MAD","Madrid","Spain",40.4839,-3.5680,"Adolfo Suárez Madrid–Barajas",["Iberia","Ryanair","Air Europa","Vueling","easyJet"]],
+["BCN","Barcelona","Spain",41.2974,2.0833,"Barcelona–El Prat",["Vueling","Ryanair","easyJet","Iberia","Wizz Air"]],
+["FCO","Rome","Italy",41.8003,12.2389,"Rome Fiumicino (Leonardo da Vinci)",["ITA Airways","Ryanair","Vueling","Wizz Air","easyJet"]],
+["MUC","Munich","Germany",48.3538,11.7861,"Munich",["Lufthansa","easyJet","Eurowings","Condor","Discover"]],
+["IST","Istanbul","Turkey",41.2753,28.7519,"Istanbul Airport",["Turkish Airlines","Pegasus","AnadoluJet"]],
+["ZRH","Zurich","Switzerland",47.4647,8.5492,"Zurich",["SWISS","Edelweiss","easyJet","Lufthansa","Eurowings"]],
+["VIE","Vienna","Austria",48.1103,16.5697,"Vienna Intl",["Austrian Airlines","Ryanair","Wizz Air","Lufthansa","easyJet"]],
+["CPH","Copenhagen","Denmark",55.6180,12.6508,"Copenhagen (Kastrup)",["SAS","Norwegian","Ryanair","easyJet","Lufthansa"]],
+["DUB","Dublin","Ireland",53.4213,-6.2701,"Dublin",["Ryanair","Aer Lingus","easyJet","British Airways","Lufthansa"]],
+["OSL","Oslo","Norway",60.1939,11.1004,"Oslo Gardermoen",["Norwegian","SAS","Widerøe","Ryanair","KLM"]],
+["ARN","Stockholm","Sweden",59.6519,17.9186,"Stockholm Arlanda",["SAS","Norwegian","Ryanair","Finnair","Lufthansa"]],
+["HEL","Helsinki","Finland",60.3172,24.9633,"Helsinki-Vantaa",["Finnair","Norwegian","SAS","Lufthansa"]],
+["LIS","Lisbon","Portugal",38.7742,-9.1342,"Humberto Delgado (Lisbon)",["TAP Air Portugal","Ryanair","easyJet","Wizz Air","Vueling"]],
+["BRU","Brussels","Belgium",50.9014,4.4844,"Brussels",["Brussels Airlines","Ryanair","TUI fly","easyJet","Lufthansa"]],
+["MXP","Milan","Italy",45.6306,8.7281,"Milan Malpensa",["easyJet","ITA Airways","Ryanair","Emirates","Neos"]],
+["ATH","Athens","Greece",37.9364,23.9445,"Athens Intl (Eleftherios Venizelos)",["Aegean Airlines","Ryanair","Sky Express","Wizz Air","Olympic Air"]],
+["PRG","Prague","Czechia",50.1008,14.2600,"Václav Havel Airport Prague",["Ryanair","Wizz Air","Smartwings","easyJet","Lufthansa"]],
+["WAW","Warsaw","Poland",52.1657,20.9671,"Warsaw Chopin",["LOT Polish Airlines","Wizz Air","Ryanair","Lufthansa"]],
+["BUD","Budapest","Hungary",47.4298,19.2611,"Budapest Ferenc Liszt Intl",["Wizz Air","Ryanair","Lufthansa","easyJet"]],
+["SVO","Moscow","Russia",55.9726,37.4146,"Sheremetyevo Intl",["Aeroflot","Nordwind","Rossiya"]],
+["DME","Moscow","Russia",55.4088,37.9063,"Domodedovo Intl",["S7 Airlines","Ural Airlines"]],
+["LED","St Petersburg","Russia",59.8003,30.2625,"Pulkovo",["Rossiya","Aeroflot","S7 Airlines"]],
+["MAN","Manchester","UK",53.3537,-2.2750,"Manchester",["Ryanair","Jet2","easyJet","TUI","Emirates"]],
+["EDI","Edinburgh","UK",55.9500,-3.3725,"Edinburgh",["easyJet","Ryanair","Jet2","British Airways","Loganair"]],
+["GVA","Geneva","Switzerland",46.2381,6.1090,"Geneva",["easyJet","SWISS","British Airways","Lufthansa"]],
+["KEF","Reykjavik","Iceland",63.9850,-22.6056,"Keflavík Intl",["Icelandair","PLAY","easyJet","Wizz Air"]],
+["OTP","Bucharest","Romania",44.5711,26.0850,"Henri Coandă Intl",["Wizz Air","Ryanair","Tarom","Lufthansa"]],
+["KBP","Kyiv","Ukraine",50.3450,30.8947,"Boryspil Intl",["Ukraine Intl Airlines"]],
+["SOF","Sofia","Bulgaria",42.6967,23.4114,"Sofia",["Wizz Air","Ryanair","Bulgaria Air","Lufthansa"]],
+["DXB","Dubai","UAE",25.2532,55.3657,"Dubai Intl",["Emirates","flydubai","Qatar Airways","IndiGo","Air India"]],
+["DOH","Doha","Qatar",25.2731,51.6081,"Hamad Intl",["Qatar Airways","Emirates","flydubai","IndiGo","Turkish Airlines"]],
+["AUH","Abu Dhabi","UAE",24.4330,54.6511,"Zayed Intl",["Etihad Airways","Wizz Air Abu Dhabi","flydubai","Air Arabia"]],
+["JED","Jeddah","Saudi Arabia",21.6796,39.1565,"King Abdulaziz Intl",["Saudia","flynas","flyadeal"]],
+["RUH","Riyadh","Saudi Arabia",24.9576,46.6988,"King Khalid Intl",["Saudia","flynas","flyadeal"]],
+["TLV","Tel Aviv","Israel",32.0114,34.8867,"Ben Gurion",["El Al","Israir","Arkia","Wizz Air","Ryanair"]],
+["AMM","Amman","Jordan",31.7226,35.9932,"Queen Alia Intl",["Royal Jordanian","Fly Jordan"]],
+["BEY","Beirut","Lebanon",33.8209,35.4884,"Beirut–Rafic Hariri Intl",["Middle East Airlines","Flynas","Turkish Airlines"]],
+["KWI","Kuwait City","Kuwait",29.2266,47.9689,"Kuwait Intl",["Kuwait Airways","Jazeera Airways"]],
+["BAH","Manama","Bahrain",26.2708,50.6336,"Bahrain Intl",["Gulf Air","flydubai","Saudia"]],
+["MCT","Muscat","Oman",23.5933,58.2844,"Muscat Intl",["Oman Air","SalamAir"]],
+["IKA","Tehran","Iran",35.4161,51.1522,"Imam Khomeini Intl",["Iran Air","Mahan Air"]],
+["DEL","Delhi","India",28.5562,77.1000,"Indira Gandhi Intl",["IndiGo","Air India","Vistara","SpiceJet","Akasa Air"]],
+["BOM","Mumbai","India",19.0896,72.8656,"Chhatrapati Shivaji Maharaj Intl",["IndiGo","Air India","Vistara","SpiceJet","Akasa Air"]],
+["BLR","Bengaluru","India",13.1986,77.7066,"Kempegowda Intl",["IndiGo","Air India","Vistara","Akasa Air","SpiceJet"]],
+["MAA","Chennai","India",12.9941,80.1709,"Chennai Intl",["IndiGo","Air India","SpiceJet","Vistara"]],
+["HYD","Hyderabad","India",17.2403,78.4294,"Rajiv Gandhi Intl",["IndiGo","Air India","Vistara","SpiceJet"]],
+["CCU","Kolkata","India",22.6547,88.4467,"Netaji Subhas Chandra Bose Intl",["IndiGo","Air India","SpiceJet","Vistara"]],
+["CMB","Colombo","Sri Lanka",7.1808,79.8841,"Bandaranaike Intl",["SriLankan Airlines","IndiGo","Emirates","Qatar Airways"]],
+["KTM","Kathmandu","Nepal",27.6966,85.3591,"Tribhuvan Intl",["Nepal Airlines","Buddha Air","Yeti Airlines","IndiGo"]],
+["DAC","Dhaka","Bangladesh",23.8433,90.3978,"Hazrat Shahjalal Intl",["Biman Bangladesh","US-Bangla","Novoair"]],
+["KHI","Karachi","Pakistan",24.9065,67.1608,"Jinnah Intl",["PIA","AirBlue","SereneAir"]],
+["ISB","Islamabad","Pakistan",33.5490,72.8256,"Islamabad Intl",["PIA","AirBlue","SereneAir"]],
+["MLE","Male","Maldives",4.1918,73.5291,"Velana Intl",["Maldivian","Emirates","Qatar Airways","IndiGo"]],
+["BKK","Bangkok","Thailand",13.6900,100.7501,"Suvarnabhumi",["Thai Airways","Thai AirAsia","Bangkok Airways","Thai Lion Air","Thai Vietjet"]],
+["SIN","Singapore","Singapore",1.3644,103.9915,"Changi",["Singapore Airlines","Scoot","Jetstar Asia","AirAsia","Qantas"]],
+["KUL","Kuala Lumpur","Malaysia",2.7456,101.7099,"Kuala Lumpur Intl",["AirAsia","Malaysia Airlines","Batik Air","Firefly"]],
+["CGK","Jakarta","Indonesia",-6.1256,106.6559,"Soekarno–Hatta Intl",["Garuda Indonesia","Lion Air","Citilink","Batik Air","AirAsia"]],
+["DPS","Bali","Indonesia",-8.7482,115.1672,"Ngurah Rai (Bali) Intl",["Garuda Indonesia","Lion Air","AirAsia","Citilink","Jetstar"]],
+["MNL","Manila","Philippines",14.5086,121.0198,"Ninoy Aquino Intl",["Philippine Airlines","Cebu Pacific","PAL Express","AirAsia"]],
+["HAN","Hanoi","Vietnam",21.2212,105.8072,"Noi Bai Intl",["Vietnam Airlines","VietJet Air","Bamboo Airways"]],
+["SGN","Ho Chi Minh City","Vietnam",10.8188,106.6520,"Tan Son Nhat Intl",["Vietnam Airlines","VietJet Air","Bamboo Airways"]],
+["RGN","Yangon","Myanmar",16.9073,96.1332,"Yangon Intl",["Myanmar Airways Intl","Myanmar National Airlines"]],
+["PNH","Phnom Penh","Cambodia",11.5466,104.8441,"Phnom Penh Intl",["Cambodia Angkor Air","AirAsia","VietJet Air"]],
+["HKT","Phuket","Thailand",8.1132,98.3169,"Phuket Intl",["Thai AirAsia","Thai Lion Air","Bangkok Airways","Nok Air"]],
+["CEB","Cebu","Philippines",10.3075,123.9793,"Mactan–Cebu Intl",["Cebu Pacific","Philippine Airlines","AirAsia"]],
+["HKG","Hong Kong","Hong Kong",22.3080,113.9185,"Hong Kong Intl",["Cathay Pacific","HK Express","Hong Kong Airlines","Greater Bay Airlines"]],
+["PEK","Beijing","China",40.0799,116.6031,"Beijing Capital Intl",["Air China","China Southern","China Eastern","Hainan Airlines"]],
+["PVG","Shanghai","China",31.1443,121.8083,"Shanghai Pudong Intl",["China Eastern","Spring Airlines","Air China","China Southern","Juneyao"]],
+["CAN","Guangzhou","China",23.3924,113.2988,"Guangzhou Baiyun Intl",["China Southern","9 Air","Air China","Shenzhen Airlines"]],
+["SZX","Shenzhen","China",22.6393,113.8107,"Shenzhen Bao'an Intl",["Shenzhen Airlines","China Southern","Hainan Airlines"]],
+["CTU","Chengdu","China",30.5785,103.9471,"Chengdu Tianfu Intl",["Sichuan Airlines","Air China","China Eastern","Chengdu Airlines"]],
+["XIY","Xi'an","China",34.4471,108.7516,"Xi'an Xianyang Intl",["China Eastern","Hainan Airlines","Air China","Loong Air"]],
+["KMG","Kunming","China",25.1019,102.9291,"Kunming Changshui Intl",["China Eastern","Lucky Air","Sichuan Airlines"]],
+["NRT","Tokyo","Japan",35.7720,140.3929,"Narita Intl",["ANA","Japan Airlines","Jetstar Japan","Peach","ZIPAIR"]],
+["HND","Tokyo","Japan",35.5494,139.7798,"Haneda (Tokyo Intl)",["ANA","Japan Airlines","Skymark","Solaseed Air","AirDo"]],
+["KIX","Osaka","Japan",34.4273,135.2440,"Kansai Intl",["Peach","ANA","Japan Airlines","Jetstar Japan"]],
+["NGO","Nagoya","Japan",34.8584,136.8054,"Chubu Centrair Intl",["ANA","Japan Airlines","Jetstar Japan"]],
+["CTS","Sapporo","Japan",42.7752,141.6923,"New Chitose",["ANA","Japan Airlines","AirDo","Peach","Skymark"]],
+["FUK","Fukuoka","Japan",33.5859,130.4510,"Fukuoka",["ANA","Japan Airlines","Skymark","Peach","StarFlyer"]],
+["ICN","Seoul","South Korea",37.4602,126.4407,"Incheon Intl",["Korean Air","Asiana","Jeju Air","T'way Air","Jin Air"]],
+["GMP","Seoul","South Korea",37.5583,126.7906,"Gimpo Intl",["Korean Air","Asiana","Jeju Air","T'way Air"]],
+["TPE","Taipei","Taiwan",25.0777,121.2328,"Taiwan Taoyuan Intl",["China Airlines","EVA Air","Starlux","Tigerair Taiwan"]],
+["ULN","Ulaanbaatar","Mongolia",47.8431,106.7666,"Chinggis Khaan Intl",["MIAT Mongolian Airlines","Aero Mongolia"]],
+["SYD","Sydney","Australia",-33.9399,151.1753,"Sydney Kingsford Smith",["Qantas","Jetstar","Virgin Australia","Rex","Emirates"]],
+["MEL","Melbourne","Australia",-37.6690,144.8410,"Melbourne (Tullamarine)",["Qantas","Jetstar","Virgin Australia","Rex"]],
+["BNE","Brisbane","Australia",-27.3842,153.1175,"Brisbane",["Qantas","Virgin Australia","Jetstar","Rex"]],
+["PER","Perth","Australia",-31.9385,115.9672,"Perth",["Qantas","Virgin Australia","Jetstar","Rex"]],
+["ADL","Adelaide","Australia",-34.9450,138.5306,"Adelaide",["Qantas","Virgin Australia","Jetstar","Rex"]],
+["AKL","Auckland","New Zealand",-37.0082,174.7850,"Auckland",["Air New Zealand","Jetstar","Qantas","Emirates"]],
+["CHC","Christchurch","New Zealand",-43.4894,172.5322,"Christchurch",["Air New Zealand","Jetstar","Qantas"]],
+["WLG","Wellington","New Zealand",-41.3272,174.8053,"Wellington",["Air New Zealand","Jetstar","Qantas"]],
+["NAN","Nadi","Fiji",-17.7554,177.4434,"Nadi Intl",["Fiji Airways","Jetstar","Qantas"]],
+["PPT","Papeete","Tahiti",-17.5537,-149.6069,"Faa'a Intl",["Air Tahiti Nui","Air France","French Bee"]],
+["JNB","Johannesburg","South Africa",-26.1392,28.2460,"O.R. Tambo Intl",["FlySafair","Airlink","Lift","South African Airways","Emirates"]],
+["CPT","Cape Town","South Africa",-33.9648,18.6017,"Cape Town Intl",["FlySafair","Airlink","Lift","British Airways","Emirates"]],
+["DUR","Durban","South Africa",-29.6144,31.1197,"King Shaka Intl",["FlySafair","Airlink","Lift"]],
+["NBO","Nairobi","Kenya",-1.3192,36.9278,"Jomo Kenyatta Intl",["Kenya Airways","Jambojet","Emirates","Qatar Airways"]],
+["ADD","Addis Ababa","Ethiopia",8.9779,38.7993,"Addis Ababa Bole Intl",["Ethiopian Airlines"]],
+["CAI","Cairo","Egypt",30.1219,31.4056,"Cairo Intl",["EgyptAir","Air Cairo","Nile Air"]],
+["CMN","Casablanca","Morocco",33.3675,-7.5900,"Mohammed V Intl",["Royal Air Maroc","Air Arabia Maroc","Ryanair"]],
+["LOS","Lagos","Nigeria",6.5774,3.3212,"Murtala Muhammed Intl",["Air Peace","Arik Air","Ibom Air","Green Africa"]],
+["ACC","Accra","Ghana",5.6052,-0.1668,"Kotoka Intl",["Africa World Airlines","Air Peace","Ethiopian Airlines"]],
+["DAR","Dar es Salaam","Tanzania",-6.8781,39.2026,"Julius Nyerere Intl",["Air Tanzania","Precision Air","Ethiopian Airlines"]],
+["ALG","Algiers","Algeria",36.6910,3.2154,"Houari Boumediene",["Air Algérie","Tassili Airlines"]],
+["TUN","Tunis","Tunisia",36.8510,10.2272,"Tunis–Carthage Intl",["Tunisair","Nouvelair"]],
+["DKR","Dakar","Senegal",14.6710,-17.0732,"Blaise Diagne Intl",["Air Senegal","Transair","Royal Air Maroc"]],
+["EBB","Entebbe","Uganda",0.0424,32.4435,"Entebbe Intl",["Uganda Airlines","Kenya Airways","Ethiopian Airlines"]],
+["MRU","Mauritius","Mauritius",-20.4302,57.6836,"Sir Seewoosagur Ramgoolam Intl",["Air Mauritius","Emirates","Air France"]],
+["SEZ","Mahe","Seychelles",-4.6743,55.5218,"Seychelles Intl",["Air Seychelles","Emirates","Etihad Airways"]],
+["ABV","Abuja","Nigeria",9.0068,7.2632,"Nnamdi Azikiwe Intl",["Air Peace","Arik Air","Ibom Air"]],
+["LUN","Lusaka","Zambia",-15.3308,28.4526,"Kenneth Kaunda Intl",["Proflight Zambia","Ethiopian Airlines","Emirates"]],
+["HRE","Harare","Zimbabwe",-17.9319,31.0928,"Robert Gabriel Mugabe Intl",["Air Zimbabwe","FastJet","Ethiopian Airlines"]],
+["WDH","Windhoek","Namibia",-22.4799,17.4709,"Hosea Kutako Intl",["Airlink","FlyNamibia","Ethiopian Airlines"]],
+["GBE","Gaborone","Botswana",-24.5552,25.9182,"Sir Seretse Khama Intl",["Air Botswana","Airlink"]],
+["MPM","Maputo","Mozambique",-25.9208,32.5726,"Maputo Intl",["LAM Mozambique","Airlink","TAP Air Portugal"]]
+];
+const COLORS=['#49a2d1','#c39a57','#56a985','#a775c0','#cf7c55','#6a8ed2','#cf6c78','#80b965','#d4ad46','#5cb4b6'];
+const DAY=86400000;let stops=[];let activeView='gantt';let ganttScale=1;
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function parseDate(s){if(!s)return null;const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}function days(a,b){return Math.round((b-a)/DAY)}function fmt(d,year=false){return d?d.toLocaleDateString(undefined,{day:'numeric',month:'short',...(year?{year:'numeric'}:{})}):'—'}
+function hav(a,b){const r=6371,to=x=>x*Math.PI/180,dla=to(b[3]-a[3]),dlo=to(b[4]-a[4]),la1=to(a[3]),la2=to(b[3]);const h=Math.sin(dla/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dlo/2)**2;return 2*r*Math.asin(Math.sqrt(h))}
+function color(i){return COLORS[i%COLORS.length]}function nights(i){const s=stops[i],n=stops[i+1];if(!s)return 0;if(n&&s.date&&n.date)return Math.max(0,days(parseDate(s.date),parseDate(n.date)));return Math.max(1,+s.nights||1)}
+const map2d=L.map('map2d',{worldCopyJump:true,zoomControl:true}).setView([15,15],2);L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19,subdomains:'abcd',attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map2d);let routeLayer=L.layerGroup().addTo(map2d);
+let globe=null,globeReady=false,mapMode='2d';
+function ensureGlobe(){if(globeReady)return;globe=new Cesium.Viewer('map3d',{baseLayerPicker:false,geocoder:false,homeButton:false,sceneModePicker:false,navigationHelpButton:false,animation:false,timeline:false,fullscreenButton:false,infoBox:true,selectionIndicator:true,shouldAnimate:true,imageryProvider:new Cesium.UrlTemplateImageryProvider({url:'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',subdomains:['a','b','c','d'],credit:'OpenStreetMap / CARTO'})});globe.scene.globe.enableLighting=true;globe.scene.backgroundColor=Cesium.Color.fromCssColorString('#08070d');globeReady=true}
+function renderMap(){routeLayer.clearLayers();if(!stops.length){map2d.setView([15,15],2);if(globeReady)globe.entities.removeAll();return}const latlngs=[];stops.forEach((s,i)=>{const a=s.a,ll=[a[3],a[4]];latlngs.push(ll);L.circleMarker(ll,{radius:7,color:'#090711',weight:2,fillColor:color(i),fillOpacity:1}).bindPopup(`<b>${i+1}. ${a[0]} — ${a[1]}</b><br>${a[5]}<br>${s.date?fmt(parseDate(s.date),true):'Date not set'} · ${nights(i)} night${nights(i)==1?'':'s'}`).addTo(routeLayer)});if(latlngs.length>1)L.polyline(latlngs,{color:'#72d4d8',weight:3,opacity:.9,dashArray:'8 8'}).addTo(routeLayer);map2d.fitBounds(L.latLngBounds(latlngs).pad(.25),{maxZoom:5});if(globeReady)renderGlobe()}
+function renderGlobe(){ensureGlobe();globe.entities.removeAll();if(!stops.length)return;const positions=[];stops.forEach((s,i)=>{const a=s.a,p=Cesium.Cartesian3.fromDegrees(a[4],a[3],10000);positions.push(p);globe.entities.add({name:`${i+1}. ${a[0]} — ${a[1]}`,description:`${a[5]}<br>${s.date?fmt(parseDate(s.date),true):'Date not set'} · ${nights(i)} nights`,position:p,point:{pixelSize:12,color:Cesium.Color.fromCssColorString(color(i)),outlineColor:Cesium.Color.fromCssColorString('#090711'),outlineWidth:3},label:{text:`${i+1}. ${a[0]}`,font:'700 14px Manrope',fillColor:Cesium.Color.WHITE,outlineColor:Cesium.Color.BLACK,outlineWidth:3,style:Cesium.LabelStyle.FILL_AND_OUTLINE,pixelOffset:new Cesium.Cartesian2(0,-24),distanceDisplayCondition:new Cesium.DistanceDisplayCondition(0,18000000)}})});if(positions.length>1)globe.entities.add({polyline:{positions,width:3,material:new Cesium.PolylineGlowMaterialProperty({glowPower:.22,color:Cesium.Color.fromCssColorString('#72d4d8')}),arcType:Cesium.ArcType.GEODESIC}});globe.flyTo(globe.entities,{duration:1.2,offset:new Cesium.HeadingPitchRange(0,Cesium.Math.toRadians(-70),0)})}
+function setMapMode(mode){mapMode=mode;const is3=mode==='3d';$('#map2d').classList.toggle('hidden',is3);$('#map3d').classList.toggle('hidden',!is3);$('#mode2d').classList.toggle('active',!is3);$('#mode3d').classList.toggle('active',is3);$('#mapTitle').textContent=is3?'Interactive 3D globe':'Interactive 2D map';$('#mapSub').textContent=is3?'Rotatable globe · geodesic flight route':'Dark basemap · route fitted automatically';if(is3){ensureGlobe();renderGlobe();setTimeout(()=>globe.resize(),80)}else setTimeout(()=>map2d.invalidateSize(),80)}
+$('#mode2d').onclick=()=>setMapMode('2d');$('#mode3d').onclick=()=>setMapMode('3d');
+function renderList(){$('#stopList').innerHTML='';$('#empty').style.display=stops.length?'none':'block';stops.forEach((s,i)=>{const a=s.a,el=document.createElement('div');el.className='stop-card';el.innerHTML=`<div class="stop-head"><span class="badge" style="background:${color(i)}">${i+1}</span><div class="stop-main"><div class="stop-title"><span>${a[0]}</span> · ${a[1]}</div><div class="stop-sub">${a[5]}</div></div><div class="mini-actions"><button data-up="${i}">↑</button><button data-dn="${i}">↓</button><button data-rm="${i}">×</button></div></div><div class="dategrid"><div><label>Arrival date</label><input type="date" data-date="${i}" value="${s.date||''}"></div><div><label>Nights</label><input type="number" min="1" max="60" data-night="${i}" value="${nights(i)}" ${i<stops.length-1?'disabled':''}></div></div>`;$('#stopList').append(el)})}
+function tripInfo(){let dist=0;for(let i=0;i<stops.length-1;i++)dist+=hav(stops[i].a,stops[i+1].a);const start=parseDate(stops[0]?.date);let end=null;if(stops.length){const last=stops.at(-1);if(last.date)end=addDays(parseDate(last.date),nights(stops.length-1))}return{dist,start,end,total:start&&end?days(start,end):stops.reduce((x,_,i)=>x+nights(i),0)}}
+function stats(){const t=tripInfo();$('#statStops').textContent=stops.length;$('#statNights').textContent=t.total||0;$('#statKm').textContent=Math.round(t.dist).toLocaleString();$('#sumRange').textContent=t.start&&t.end?`${fmt(t.start)}–${fmt(t.end,true)}`:'—';$('#sumDuration').textContent=t.total?`${t.total} nights`:'—';$('#sumDistance').textContent=`${Math.round(t.dist).toLocaleString()} km`;$('#sumLegs').textContent=Math.max(0,stops.length-1)}
+function render(){renderList();renderMap();stats();renderView();localStorage.setItem('gTravelStops',JSON.stringify(stops.map(s=>({iata:s.a[0],date:s.date,nights:s.nights}))))}
+function dateBounds(){const dated=stops.filter(s=>s.date);if(!dated.length)return null;const start=parseDate(dated[0].date);const last=stops.at(-1);const end=last.date?addDays(parseDate(last.date),nights(stops.length-1)):addDays(start,1);return{start,end,total:Math.max(1,days(start,end))}}
+function renderGantt(){const b=dateBounds();if(!b){$('#view').innerHTML=`<div class="empty" style="margin:30px">Set arrival dates or use <b>Auto dates</b> to create the project timeline.</div>`;return}const total=b.total;let labels='',rows='';stops.forEach((s,i)=>{const d=parseDate(s.date);const left=d?days(b.start,d)/total*100:0;const len=nights(i);const width=Math.max(1.2,len/total*100);labels+=`<div class="gantt-row-label"><span class="badge" style="background:${color(i)}">${i+1}</span><div><b>${s.a[0]} · ${s.a[1]}</b><small>${fmt(d)} · ${len} night${len==1?'':'s'}</small></div></div>`;rows+=`<div class="gantt-row" style="--days:${Math.min(total,40)}"><div class="gantt-bar" style="left:${left}%;width:${width}%;background:${color(i)}" title="${s.a[1]}: ${fmt(d,true)} for ${len} nights">${s.a[0]} · ${len}n</div>${i>0?`<div class="flight-pin" style="left:${left}%"></div>`:''}</div>`});const ticks=Math.min(total,14);let th='';for(let i=0;i<=ticks;i++){const d=addDays(b.start,Math.round(i/ticks*total));th+=`<div class="tick">${fmt(d)}</div>`}const today=new Date();today.setHours(0,0,0,0);const tp=days(b.start,today)/total*100;$('#view').innerHTML=`<div class="gantt-shell"><div class="gantt-toolbar"><div><h3>Trip project timeline</h3><span class="muted">Shared date axis with flights shown as milestones</span></div><div class="spacer"></div><label>View<select id="scale" class="control"><option value="1">Fit trip</option><option value="1.5">Expanded</option><option value="2">Detailed</option></select></label></div><div class="gantt-grid" style="width:${100*ganttScale}%"><div class="gantt-left"><div class="gantt-head">Destination / workstream</div>${labels}</div><div class="gantt-right"><div class="gantt-head timeline-head" style="grid-template-columns:repeat(${ticks+1},1fr)">${th}</div>${tp>=0&&tp<=100?`<div class="todayline" style="left:${tp}%"></div>`:''}${rows}</div></div></div>`;$('#scale').value=String(ganttScale);$('#scale').onchange=e=>{ganttScale=+e.target.value;renderGantt()}}
+function dayMap(){const out={};stops.forEach((s,i)=>{if(!s.date)return;const d=parseDate(s.date),len=nights(i);for(let n=0;n<len;n++)out[iso(addDays(d,n))]={i,arrival:n===0}});return out}
+function renderCalendar(){const b=dateBounds();if(!b){$('#view').innerHTML='<div class="empty" style="margin:30px">Set arrival dates to populate the calendar.</div>';return}const mapd=dayMap();const first=new Date(b.start.getFullYear(),b.start.getMonth(),1),last=new Date(b.end.getFullYear(),b.end.getMonth(),1);let months='';for(let m=new Date(first);m<=last;m.setMonth(m.getMonth()+1)){const y=m.getFullYear(),mo=m.getMonth(),offset=(new Date(y,mo,1).getDay()+6)%7,nd=new Date(y,mo+1,0).getDate();let cells=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div class="wd">${x}</div>`).join('');for(let i=0;i<offset;i++)cells+='<div class="day blank"></div>';for(let d=1;d<=nd;d++){const dt=new Date(y,mo,d),info=mapd[iso(dt)];cells+=`<div class="day ${info?'intrip':''}"><span class="daynum">${d}</span>${info?`${info.arrival?'<span class="arrival">✈</span>':''}<div class="citychip" style="background:${color(info.i)}">${stops[info.i].a[0]} · ${stops[info.i].a[1]}</div>`:''}</div>`}months+=`<section class="month"><div class="month-title">${m.toLocaleDateString(undefined,{month:'long',year:'numeric'})}</div><div class="cal-grid">${cells}</div></section>`}const leg=stops.map((s,i)=>`<span><i style="background:${color(i)}"></i>${s.a[0]} ${s.a[1]}</span>`).join('');$('#view').innerHTML=`<div class="calendar-shell"><div class="calendar-top"><div><h3>Trip calendar</h3><span class="muted">Large monthly planning view</span></div><div class="spacer"></div></div><div class="months">${months}</div><div class="legend">${leg}</div></div>`}
+function renderLegs(){if(stops.length<2){$('#view').innerHTML='<div class="empty" style="margin:30px">Add at least two destinations to create flight legs.</div>';return}let rows='',total=0;for(let i=0;i<stops.length-1;i++){const d=hav(stops[i].a,stops[i+1].a);total+=d;rows+=`<tr><td>${i+1}</td><td><b>${stops[i].a[0]}</b> · ${stops[i].a[1]}</td><td><b>${stops[i+1].a[0]}</b> · ${stops[i+1].a[1]}</td><td>${stops[i+1].date?fmt(parseDate(stops[i+1].date),true):'—'}</td><td class="num">${Math.round(d).toLocaleString()}</td></tr>`}$('#view').innerHTML=`<table><thead><tr><th>#</th><th>From</th><th>To</th><th>Arrival</th><th class="num">Distance (km)</th></tr></thead><tbody>${rows}<tr class="total"><td></td><td>Total</td><td>${stops.length-1} legs</td><td></td><td class="num">${Math.round(total).toLocaleString()}</td></tr></tbody></table>`}
+function renderView(){activeView==='gantt'?renderGantt():activeView==='calendar'?renderCalendar():renderLegs()}
+function query(q){q=q.trim().toLowerCase();if(!q)return[];return AIRPORTS.map(a=>({a,score:a[0].toLowerCase()===q?0:a[1].toLowerCase().startsWith(q)?1:(a[0]+' '+a[1]+' '+a[2]+' '+a[5]).toLowerCase().includes(q)?2:99})).filter(x=>x.score<99).sort((x,y)=>x.score-y.score).slice(0,9).map(x=>x.a)}
+function showResults(){const list=query($('#search').value),r=$('#results');r.innerHTML=list.map((a,i)=>`<div class="res" data-i="${i}"><span class="iata">${a[0]}</span><div>${a[1]}<small>${a[5]} · ${a[2]}</small></div></div>`).join('');r.classList.toggle('open',!!list.length);r._list=list}
+function addAirport(a){const prev=stops.at(-1);let date=null;if(prev?.date)date=iso(addDays(parseDate(prev.date),nights(stops.length-1)));stops.push({a,date,nights:3});$('#search').value='';$('#results').classList.remove('open');render()}
+$('#search').oninput=showResults;$('#search').onkeydown=e=>{if(e.key==='Enter'){const a=query(e.target.value)[0];if(a)addAirport(a)}};$('#add').onclick=()=>{const a=query($('#search').value)[0];if(a)addAirport(a)};$('#results').onclick=e=>{const x=e.target.closest('.res');if(x)addAirport($('#results')._list[+x.dataset.i])};
+$('#stopList').onclick=e=>{const b=e.target.closest('button');if(!b)return;let i;if(b.dataset.rm!=null){i=+b.dataset.rm;stops.splice(i,1)}else if(b.dataset.up!=null){i=+b.dataset.up;if(i>0)[stops[i-1],stops[i]]=[stops[i],stops[i-1]]}else if(b.dataset.dn!=null){i=+b.dataset.dn;if(i<stops.length-1)[stops[i+1],stops[i]]=[stops[i],stops[i+1]]}render()};
+$('#stopList').onchange=e=>{if(e.target.dataset.date!=null){const i=+e.target.dataset.date;stops[i].date=e.target.value||null;if(i<stops.length-1&&stops[i].date){let d=parseDate(stops[i].date);for(let j=i+1;j<stops.length;j++){d=addDays(d,nights(j-1));stops[j].date=iso(d)}}}if(e.target.dataset.night!=null)stops[+e.target.dataset.night].nights=Math.max(1,+e.target.value||1);render()};
+function autoDates(){let d=parseDate(stops[0]?.date)||new Date();d=new Date(d.getFullYear(),d.getMonth(),d.getDate());stops.forEach((s,i)=>{s.date=iso(d);d=addDays(d,nights(i))});render()}
+$('#autodates').onclick=autoDates;$('#clear').onclick=()=>{stops=[];render()};$('#sample').onclick=()=>{const plan=[['JNB',0],['DXB',4],['LHR',7],['IST',11],['NRT',15],['HKG',20],['JNB',24]],base=new Date();base.setHours(0,0,0,0);stops=plan.map(([c,o],i)=>({a:AIRPORTS.find(a=>a[0]===c),date:iso(addDays(base,o)),nights:i===plan.length-1?1:3}));render()};
+$$('.tab').forEach(t=>t.onclick=()=>{$$('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');activeView=t.dataset.view;renderView()});
+function flightDateForLeg(i){return stops[i+1]?.date||null}
+function googleFlightsUrl(query){return 'https://www.google.com/travel/flights?q='+encodeURIComponent(query)}
+function buildFlightQuery(i){const from=stops[i],to=stops[i+1],date=flightDateForLeg(i);if(!from||!to)return null;return `Flights from ${from.a[0]} to ${to.a[0]}${date?' on '+date:''}`}
+function openGoogleFlights(query){window.open(googleFlightsUrl(query),'_blank','noopener,noreferrer')}
+function renderExportMenu(){const menu=$('#exportMenu');if(stops.length<2){menu.innerHTML='<h4>Google Flights export</h4><p>Add at least two destinations first.</p>';return}const missing=[];const legs=[];for(let i=0;i<stops.length-1;i++){const date=flightDateForLeg(i);if(!date)missing.push(i+1);legs.push({i,date,query:buildFlightQuery(i)})}const combined='Multi-city '+legs.map(x=>buildFlightQuery(x.i)).join(', then ');menu.innerHTML=`<h4>Smart Google Flights export</h4><p>Open the full journey as one natural-language multi-city search, or search each dated leg independently.</p><button class="export-all" data-all="1"><b>Open complete multi-city search</b><br><span class="muted">${stops.map(s=>s.a[0]).join(' → ')}</span></button><div class="leg-searches">${legs.map(x=>`<div class="leg-search"><div><b>Leg ${x.i+1}: ${stops[x.i].a[0]} → ${stops[x.i+1].a[0]}</b><small>${x.date?fmt(parseDate(x.date),true):'Flexible date — arrival date not set'}</small></div><button data-leg="${x.i}">Search</button></div>`).join('')}</div>${missing.length?`<div class="warning">Dates missing for leg${missing.length>1?'s':''} ${missing.join(', ')}. Google Flights will treat those searches as flexible.</div>`:''}`;menu._combined=combined}
+$('#googleFlights').onclick=e=>{e.stopPropagation();renderExportMenu();$('#exportMenu').classList.toggle('open')};
+$('#exportMenu').onclick=e=>{const all=e.target.closest('[data-all]'),leg=e.target.closest('[data-leg]');if(all)openGoogleFlights($('#exportMenu')._combined);if(leg)openGoogleFlights(buildFlightQuery(+leg.dataset.leg))};
+document.addEventListener('click',e=>{if(!e.target.closest('.flight-export'))$('#exportMenu').classList.remove('open')});
+$('#csv').onclick=e=>{e.preventDefault();if(!stops.length)return;let s='stop,iata,city,country,arrival,nights,next_stop,distance_km\n';stops.forEach((x,i)=>{const n=stops[i+1],d=n?hav(x.a,n.a):'';s+=`${i+1},${x.a[0]},"${x.a[1]}","${x.a[2]}",${x.date||''},${nights(i)},${n?n.a[0]:''},${d===''?'':d.toFixed(0)}\n`});const u=URL.createObjectURL(new Blob([s],{type:'text/csv'})),a=document.createElement('a');a.href=u;a.download='g-travel-project-itinerary.csv';a.click();URL.revokeObjectURL(u)};
+try{const saved=JSON.parse(localStorage.getItem('gTravelStops')||'[]');stops=saved.map(s=>({a:AIRPORTS.find(a=>a[0]===s.iata),date:s.date,nights:s.nights||3})).filter(s=>s.a)}catch{}render();setTimeout(()=>map2d.invalidateSize(),100);
+</script></body></html>
