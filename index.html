@@ -34,12 +34,53 @@ h2{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mute
 /* MapLibre professional map */
 .maplibregl-map{font-family:inherit;background:#05070b}.maplibregl-canvas{outline:none}.maplibregl-ctrl-group{background:rgba(14,16,24,.9)!important;border:1px solid var(--line);box-shadow:var(--shadow)!important}.maplibregl-ctrl-group button{border-radius:0}.maplibregl-popup-content{background:#10131c;color:var(--ink);border:1px solid #34394a;border-radius:14px;padding:14px;box-shadow:0 18px 45px rgba(0,0,0,.55)}.maplibregl-popup-tip{border-top-color:#10131c!important;border-bottom-color:#10131c!important}.maplibregl-popup-close-button{color:var(--muted);font-size:20px}.maplibregl-ctrl-attrib{background:rgba(5,7,11,.72)!important;color:#aeb5c4}.maplibregl-ctrl-attrib a{color:#78d7db}.map-error{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:30px;background:radial-gradient(circle at 50% 35%,#151b2b,#05070b 62%);z-index:10}.map-error b{display:block;font-size:18px;margin-bottom:8px}.map-error code{color:var(--gold)}
 .linkbtn{display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap}.tabsbar button.linkbtn{background:transparent}.brand h1{font-weight:800;letter-spacing:-.03em}.brand small{letter-spacing:.01em}.airport-popup h4{margin:0 0 4px;font-size:16px}.airport-popup .code{color:var(--blue);font-weight:800}.airport-popup .meta{color:var(--muted);font-size:12px;margin-top:5px}.airport-popup .route-no{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;color:#071015;font-weight:800;margin-right:7px}
+
+.mobile-itinerary-btn{display:none;margin-left:auto;padding:8px 11px;background:#171522;border-color:#3b354b}
+@media (max-width:900px){
+ html,body{overflow-x:hidden}
+ header{height:62px;padding:0 12px;gap:10px}
+ .brandmark{width:38px;height:38px;border-radius:11px}.brandmark svg{width:33px;height:33px}
+ .brand h1{font-size:16px}.brand small{display:none}.mobile-itinerary-btn{display:inline-flex;align-items:center;gap:6px}
+ main{display:flex;flex-direction:column;min-height:calc(100vh - 62px)}
+ aside{order:2;width:100%;max-height:none;padding:14px;border-right:0;border-top:1px solid var(--line);display:none}
+ body.mobile-sidebar-open aside{display:block}
+ .workspace{order:1;display:grid;grid-template-rows:minmax(360px,58svh) auto;min-height:0;width:100%}
+ .mapbox{min-height:360px}
+ .map-switch{left:10px;top:10px}.map-switch button{padding:8px 10px}
+ .map-overlay{right:10px;top:60px;max-width:calc(100% - 20px);padding:8px 10px}
+ .bottom{min-height:0;overflow:visible}
+ .tabsbar{position:sticky;top:62px;z-index:900;display:flex;overflow-x:auto;gap:6px;padding:9px 10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+ .tabsbar::-webkit-scrollbar{display:none}.tabsbar .spacer{display:none}.tabsbar button,.tabsbar a{flex:0 0 auto;min-height:42px;padding:9px 11px}
+ .flight-export{position:static}.export-menu{position:fixed;left:10px;right:10px;top:74px;width:auto;max-height:calc(100svh - 90px);overflow:auto}
+ .view{padding:10px;overflow-x:hidden}
+ .gantt-shell{overflow-x:auto;-webkit-overflow-scrolling:touch}.gantt{min-width:760px}
+ .months{display:grid!important;grid-template-columns:1fr!important;gap:12px!important}.month{min-width:0!important;width:100%}
+ .cal-cell{min-height:46px}.cal-cell .day{font-size:12px}.cal-cell .city{font-size:9px}
+ .legs-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.legs-table,.flight-table,table{min-width:680px}
+ .actions{display:grid;grid-template-columns:1fr 1fr}.actions button{min-height:44px}.actions button:last-child{grid-column:1/-1}
+ .searchrow input{min-width:0}.searchrow button{min-width:72px;min-height:44px}
+ .stop-card{padding:12px}.mini-actions button{min-width:38px;min-height:38px;padding:7px}
+ .dategrid{grid-template-columns:1fr 92px}.dategrid input{min-height:42px}
+ .summarygrid{grid-template-columns:1fr 1fr}
+ button,input,a{touch-action:manipulation}
+}
+@media (max-width:560px){
+ header{padding:0 10px}.mobile-itinerary-btn{font-size:12px;padding:8px 9px}
+ .workspace{grid-template-rows:minmax(330px,52svh) auto}.mapbox{min-height:330px}
+ .map-overlay{display:none}.map-switch{right:10px;left:auto}
+ .tabsbar{top:62px}.tabsbar .tab{font-size:12px}
+ .view{padding:8px}.calendar-shell,.gantt-shell{border-radius:10px}
+ .cal-cell{min-height:42px;border-radius:6px}.cal-wd{font-size:9px}
+ .summarygrid{gap:8px}.summarygrid b{font-size:15px}
+ .dategrid{grid-template-columns:1fr 84px;gap:6px}
+ .airport-node-label{display:none}.maplibregl-popup{max-width:86vw!important}
+}
 @media print{header,aside,.map-switch,.map-overlay,.tabsbar{position:static!important}.app{display:block}.workspace{display:block}.mapbox{height:420px;page-break-after:always}aside{border:0}.bottom{overflow:visible}.gantt-shell,.calendar-shell{break-inside:avoid}button,.flight-export{display:none!important}}
 </style>
 </head>
 <body><div class="app">
-<header><div class="brandmark" aria-label="G Travel logo" title="G Travel"><svg viewBox="0 0 64 64" role="img"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#72d4d8"/><stop offset="1" stop-color="#9f8cff"/></linearGradient></defs><circle cx="32" cy="32" r="22" fill="none" stroke="url(#lg)" stroke-width="3"/><path d="M12 34c10-13 23-18 39-14" fill="none" stroke="#e6b86a" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 4"/><path d="M39 18l11 2-8 8 1-6-6-1z" fill="#e6b86a"/><path d="M41 41c-3.4 4-8.5 6.5-14 6.5-10.2 0-18.5-7.1-18.5-15.8S16.8 16 27 16c5.4 0 10.3 2 13.7 5.4l-5.2 5.1A11.8 11.8 0 0 0 27 23c-6 0-10.8 3.9-10.8 8.8S21 40.6 27 40.6c4.5 0 7.7-2.1 9-5.5h-9v-6.4h16.6c.2 1 .3 2 .3 3.1 0 3.5-1 6.6-2.9 9.2z" fill="url(#lg)"/></svg></div><div class="brand"><h1>G Travel</h1><small>Professional multi-city journey planner</small></div><div class="headstats"><div><b id="statStops">0</b>Stops</div><div><b id="statNights">0</b>Nights</div><div><b id="statKm">0</b>km</div></div></header>
-<main><aside>
+<header><div class="brandmark" aria-label="G Travel logo" title="G Travel"><svg viewBox="0 0 64 64" role="img"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#72d4d8"/><stop offset="1" stop-color="#9f8cff"/></linearGradient></defs><circle cx="32" cy="32" r="22" fill="none" stroke="url(#lg)" stroke-width="3"/><path d="M12 34c10-13 23-18 39-14" fill="none" stroke="#e6b86a" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="3 4"/><path d="M39 18l11 2-8 8 1-6-6-1z" fill="#e6b86a"/><path d="M41 41c-3.4 4-8.5 6.5-14 6.5-10.2 0-18.5-7.1-18.5-15.8S16.8 16 27 16c5.4 0 10.3 2 13.7 5.4l-5.2 5.1A11.8 11.8 0 0 0 27 23c-6 0-10.8 3.9-10.8 8.8S21 40.6 27 40.6c4.5 0 7.7-2.1 9-5.5h-9v-6.4h16.6c.2 1 .3 2 .3 3.1 0 3.5-1 6.6-2.9 9.2z" fill="url(#lg)"/></svg></div><div class="brand"><h1>G Travel</h1><small>Professional multi-city journey planner</small></div><button id="mobileItinerary" class="mobile-itinerary-btn" aria-expanded="false" aria-controls="tripSidebar">☰ Itinerary</button><div class="headstats"><div><b id="statStops">0</b>Stops</div><div><b id="statNights">0</b>Nights</div><div><b id="statKm">0</b>km</div></div></header>
+<main><aside id="tripSidebar">
 <h2>Add destination</h2><div class="searchrow"><input id="search" type="text" placeholder="Search airport, city or IATA"><button id="add" class="primary">Add</button></div><div class="results" id="results"></div>
 <div class="actions"><button id="sample">Load sample</button><button id="autodates">Auto dates</button><button id="clear">Clear</button></div>
 <h2 style="margin-top:22px">Itinerary</h2><div id="stopList" class="stop-list"></div><div id="empty" class="empty">Add your first destination to begin.</div>
@@ -342,4 +383,22 @@ $('#ics').onclick=e=>{e.preventDefault();if(!stops.length)return;let out=['BEGIN
 $('#printPlan').onclick=()=>window.print();
 $('#csv').onclick=e=>{e.preventDefault();if(!stops.length)return;let s='stop,iata,city,country,arrival,nights,next_stop,distance_km\n';stops.forEach((x,i)=>{const n=stops[i+1],d=n?hav(x.a,n.a):'';s+=`${i+1},${x.a[0]},"${x.a[1]}","${x.a[2]}",${x.date||''},${nights(i)},${n?n.a[0]:''},${d===''?'':d.toFixed(0)}\n`});const u=URL.createObjectURL(new Blob([s],{type:'text/csv'})),a=document.createElement('a');a.href=u;a.download='g-travel-project-itinerary.csv';a.click();URL.revokeObjectURL(u)};
 try{const saved=JSON.parse(localStorage.getItem('gTravelStops')||'[]');stops=saved.map(s=>({a:AIRPORTS.find(a=>a[0]===s.iata),date:s.date,nights:s.nights||3})).filter(s=>s.a)}catch{}render();setTimeout(()=>{if(travelMap)travelMap.resize()},100);
-</script></body></html>
+</script>
+<script>
+(function(){
+ const btn=document.getElementById('mobileItinerary');
+ if(!btn)return;
+ btn.addEventListener('click',()=>{
+   const open=document.body.classList.toggle('mobile-sidebar-open');
+   btn.setAttribute('aria-expanded',String(open));
+   btn.textContent=open?'✕ Close itinerary':'☰ Itinerary';
+   if(open) document.getElementById('tripSidebar')?.scrollIntoView({behavior:'smooth',block:'start'});
+   setTimeout(()=>{ try{ travelMap?.resize(); }catch(e){} },180);
+ });
+ window.addEventListener('resize',()=>{
+   if(window.innerWidth>900){document.body.classList.remove('mobile-sidebar-open');btn.setAttribute('aria-expanded','false');btn.textContent='☰ Itinerary';}
+   try{ travelMap?.resize(); }catch(e){}
+ });
+})();
+</script>
+</body></html>
